@@ -15,6 +15,10 @@ public class BPlusTree<E extends Comparable<E>> {
     root = new Node<>(null, null, true);
   }
 
+  public boolean contains(E element) {
+    return containsRecursive(root, element);
+  }
+
   public BPlusTree(int bf) throws IllegalArgumentException {
     if (bf < 3) throw new IllegalArgumentException("Branching factor must be at least 3");
     this.bf = bf;
@@ -36,6 +40,17 @@ public class BPlusTree<E extends Comparable<E>> {
     newRoot.children.add(splitRoot);
 
     root = newRoot;
+  }
+
+  private boolean containsRecursive(Node<E> node, E element) {
+    if (node.isLeaf()) return node.items.contains(element);
+    int at;
+    for (at = 0; at < node.items.size(); at++) {
+      if (node.items.get(at).compareTo(element) >= 0) break;
+    }
+
+    if (at < node.items.size() && node.items.equals(element)) return true;
+    return containsRecursive(node.children.get(at), element);
   }
 
   private void addRecursive(Node<E> node, E element) {

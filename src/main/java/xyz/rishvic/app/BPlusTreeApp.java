@@ -25,7 +25,6 @@ public class BPlusTreeApp implements Callable<Integer> {
 
   @Override
   public Integer call() throws Exception {
-    logger.info("Hello World!");
     BPlusTree<Integer> tree;
     try {
       tree = new BPlusTree<>(bf);
