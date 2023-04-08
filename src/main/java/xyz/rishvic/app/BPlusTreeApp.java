@@ -70,6 +70,21 @@ public class BPlusTreeApp implements Callable<Integer> {
             tree.clear();
             break;
 
+          case "CONTAINS":
+            while (tokenizer.hasMoreTokens()) {
+              String token = tokenizer.nextToken();
+              int val;
+              try {
+                val = Integer.parseInt(token, 10);
+              } catch (NumberFormatException e) {
+                logger.error("Invalid integer: {}", token);
+                continue;
+              }
+              System.out.printf("%d: %b\n", val, tree.contains(val));
+              logger.debug("Added {}", val);
+            }
+            break;
+
           case "ADD":
             while (tokenizer.hasMoreTokens()) {
               String token = tokenizer.nextToken();
@@ -112,7 +127,12 @@ public class BPlusTreeApp implements Callable<Integer> {
         if (verbose && mutableCommands.contains(command.toUpperCase())) {
           System.out.printf("%s", tree.toPrettyString());
         }
-      } catch (UserInterruptException ignored) {
+      } catch (UserInterruptException e) {
+        if (!e.getPartialLine().equals("")) {
+          interruptCount = 0;
+          continue;
+        }
+
         interruptCount++;
         if (interruptCount == 2) {
           logger.info("Interrupt received again, exiting...");
