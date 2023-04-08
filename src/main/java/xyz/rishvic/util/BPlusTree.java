@@ -10,25 +10,44 @@ public class BPlusTree<E extends Comparable<E>> {
   private final int bf;
   private Node<E> root;
 
+  /** Default constructor. Sets the branching factor to 3. */
   public BPlusTree() {
     bf = 3;
     root = new Node<>(null, null, true);
   }
 
+  /** Clears the B+ Tree. */
   public void clear() {
     root = new Node<>(null, null, true);
   }
 
+  /**
+   * Returns whether the B+ Tree contains the element or not.
+   *
+   * @param element The element to check.
+   * @return {@code true} if element is present, otherwise {@code false}.
+   */
   public boolean contains(E element) {
     return containsRecursive(root, element);
   }
 
+  /**
+   * Constructor for the class, where we can specify the branching factor.
+   *
+   * @param bf The branching factor of the tree.
+   * @throws IllegalArgumentException If the specified branching factor is less than 3.
+   */
   public BPlusTree(int bf) throws IllegalArgumentException {
     if (bf < 3) throw new IllegalArgumentException("Branching factor must be at least 3");
     this.bf = bf;
     this.root = new Node<>(null, null, true);
   }
 
+  /**
+   * Adds the element to the B+ Tree.
+   *
+   * @param element The element to add to the tree.
+   */
   public void add(E element) {
     addRecursive(root, element);
     if (root.items.size() < bf) return;
@@ -81,11 +100,26 @@ public class BPlusTree<E extends Comparable<E>> {
     node.children.add(at + 1, splitChild);
   }
 
-  public String toPrettyString() {
+  /**
+   * Returns a pretty-printed version of the tree with a specified prefix for each line.
+   *
+   * @param prefix The prefix to add to each line.
+   * @return A string with representation of the tree.
+   */
+  public String toPrettyString(String prefix) {
     StringBuilder sb = new StringBuilder();
-    sb.append(root.items).append('\n');
-    root.toPrettyStringChildren(sb, " ");
+    sb.append(prefix).append(root.items).append('\n');
+    root.toPrettyStringChildren(sb, prefix);
     return sb.toString();
+  }
+
+  /**
+   * Pretty-print the tree with no prefix.
+   *
+   * @return A string with pretty-print of tree, without any prefix.
+   */
+  public String toPrettyString() {
+    return toPrettyString("");
   }
 
   private static class Node<E extends Comparable<E>> {
