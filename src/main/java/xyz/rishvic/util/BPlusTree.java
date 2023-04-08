@@ -15,6 +15,10 @@ public class BPlusTree<E extends Comparable<E>> {
     root = new Node<>(null, null, true);
   }
 
+  public void clear() {
+    root = new Node<>(null, null, true);
+  }
+
   public boolean contains(E element) {
     return containsRecursive(root, element);
   }
@@ -46,7 +50,7 @@ public class BPlusTree<E extends Comparable<E>> {
     if (node.isLeaf()) return node.items.contains(element);
     int at;
     for (at = 0; at < node.items.size(); at++) {
-      if (node.items.get(at).compareTo(element) >= 0) break;
+      if (node.items.get(at).compareTo(element) > 0) break;
     }
 
     if (at < node.items.size() && node.items.equals(element)) return true;
@@ -56,7 +60,7 @@ public class BPlusTree<E extends Comparable<E>> {
   private void addRecursive(Node<E> node, E element) {
     int at;
     for (at = 0; at < node.items.size(); at++) {
-      if (node.items.get(at).compareTo(element) >= 0) break;
+      if (node.items.get(at).compareTo(element) > 0) break;
     }
 
     if (node.isLeaf()) {
