@@ -16,6 +16,14 @@ public class BPlusTree<E extends Comparable<E>> {
     root = new Node<>(null, null, true);
   }
 
+  /**
+   * Returns whether the B+ Tree is empty.
+   * @return Whether the B+ Tree is empty.
+   */
+  public boolean isEmpty() {
+    return root.items.isEmpty();
+  }
+
   /** Clears the B+ Tree. */
   public void clear() {
     root = new Node<>(null, null, true);

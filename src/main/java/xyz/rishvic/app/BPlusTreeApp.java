@@ -85,6 +85,17 @@ public class BPlusTreeApp implements Callable<Integer> {
             }
             break;
 
+          case "IS":
+            while (tokenizer.hasMoreTokens()) {
+              String condition = tokenizer.nextToken();
+              if (condition.equalsIgnoreCase("EMPTY")) {
+                System.out.printf("EMPTY: %b\n", tree.isEmpty());
+              } else {
+                logger.warn("Unknown condition: {}", condition);
+              }
+            }
+            break;
+
           case "ADD":
             while (tokenizer.hasMoreTokens()) {
               String token = tokenizer.nextToken();
