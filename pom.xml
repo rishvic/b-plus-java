@@ -12,6 +12,33 @@
   <name>b-plus-java</name>
   <!-- FIXME change it to the project's website -->
   <url>http://www.example.com</url>
+  <inceptionYear>2023</inceptionYear>
+
+  <licenses>
+    <license>
+      <name>Apache-2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+      <distribution>repo</distribution>
+      <comments>A business-friendly OSS license</comments>
+    </license>
+  </licenses>
+
+  <organization>
+    <name>IIT Bhubaneswar</name>
+    <url>https://www.iitbbs.ac.in/</url>
+  </organization>
+
+  <developers>
+    <developer>
+      <id>rishvic</id>
+      <name>Rishvic Pushpakaran</name>
+      <email>20cs01018@iitbbs.ac.in</email>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Asia/Kolkata</timezone>
+    </developer>
+  </developers>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -129,6 +156,14 @@
                 <id>b+demo</id>
               </program>
             </programs>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>license-maven-plugin</artifactId>
+          <version>2.0.0</version>
+          <configuration>
+            <licenseName>apache_v2</licenseName>
           </configuration>
         </plugin>
       </plugins>
