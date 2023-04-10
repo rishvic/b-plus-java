@@ -45,7 +45,7 @@ public class BPlusTreeApp implements Callable<Integer> {
     int interruptCount = 0;
     boolean verbose = false;
 
-    List<String> mutableCommands = Arrays.asList("CLEAR", "ADD");
+    List<String> mutableCommands = Arrays.asList("CLEAR", "ADD", "REMOVE");
 
     loop:
     while (true) {
@@ -85,6 +85,14 @@ public class BPlusTreeApp implements Callable<Integer> {
             }
             break;
 
+          case "FIRST":
+            System.out.printf("FIRST: %d\n", tree.first());
+            break;
+
+          case "LAST":
+            System.out.printf("LAST: %d\n", tree.last());
+            break;
+
           case "IS":
             while (tokenizer.hasMoreTokens()) {
               String condition = tokenizer.nextToken();
@@ -108,6 +116,21 @@ public class BPlusTreeApp implements Callable<Integer> {
               }
               tree.add(val);
               logger.debug("Added {}", val);
+            }
+            break;
+
+          case "REMOVE":
+            while (tokenizer.hasMoreTokens()) {
+              String token = tokenizer.nextToken();
+              int val;
+              try {
+                val = Integer.parseInt(token, 10);
+              } catch (NumberFormatException e) {
+                logger.error("Invalid integer: {}", token);
+                continue;
+              }
+              boolean removed = tree.remove(val);
+              logger.debug("Removed {}? {}", val, removed);
             }
             break;
 

@@ -18,6 +18,7 @@ public class BPlusTree<E extends Comparable<E>> {
 
   /**
    * Returns whether the B+ Tree is empty.
+   *
    * @return Whether the B+ Tree is empty.
    */
   public boolean isEmpty() {
@@ -27,6 +28,26 @@ public class BPlusTree<E extends Comparable<E>> {
   /** Clears the B+ Tree. */
   public void clear() {
     root = new Node<>(null, null, true);
+  }
+
+  /**
+   * Returns the first element in the B+ Tree. Since the elements are stored in ascending order,
+   * returns the smallest element of the set. If the tree is empty, returns {@code null}.
+   *
+   * @return The first element of the set. {@code null} if the tree is empty.
+   */
+  public E first() {
+    return root.first();
+  }
+
+  /**
+   * Returns the last element in the B+ Tree. Since the elements are stored in ascending order,
+   * returns the largest element of the set. If the tree is empty, returns {@code null}.
+   *
+   * @return The first element of the set. {@code null} if the tree is empty.
+   */
+  public E last() {
+    return root.last();
   }
 
   /**
@@ -58,7 +79,7 @@ public class BPlusTree<E extends Comparable<E>> {
    */
   public void add(E element) {
     addRecursive(root, element);
-    if (root.items.size() < bf) return;
+    if (root.items.size() <= maxItemCount(root)) return;
 
     Pair<E, Node<E>> splitRes = root.splitMid();
     assert splitRes != null : "root.splitMid() returned `null`";
@@ -73,6 +94,19 @@ public class BPlusTree<E extends Comparable<E>> {
     root = newRoot;
   }
 
+  /**
+   * Removes an element from the B+ Tree.
+   *
+   * @param element The element to remove from the tree.
+   * @return {@code true} if the element was found & removed, {@code false} if the element was not
+   *     in the tree.
+   */
+  public boolean remove(E element) {
+    boolean removed = removeRecursive(root, element);
+    if (root.items.isEmpty() && !root.isLeaf()) root = root.children.get(0);
+    return removed;
+  }
+
   private boolean containsRecursive(Node<E> node, E element) {
     if (node.isLeaf()) return node.items.contains(element);
     int at;
@@ -80,7 +114,6 @@ public class BPlusTree<E extends Comparable<E>> {
       if (node.items.get(at).compareTo(element) > 0) break;
     }
 
-    if (at < node.items.size() && node.items.equals(element)) return true;
     return containsRecursive(node.children.get(at), element);
   }
 
@@ -97,7 +130,7 @@ public class BPlusTree<E extends Comparable<E>> {
 
     Node<E> child = node.children.get(at);
     addRecursive(child, element);
-    if (child.items.size() < bf) return;
+    if (child.items.size() <= maxItemCount(child)) return;
 
     Pair<E, Node<E>> splitRes = child.splitMid();
     assert splitRes != null : "child.splitMid() returned `null`";
@@ -106,6 +139,96 @@ public class BPlusTree<E extends Comparable<E>> {
 
     node.items.add(at, midElement);
     node.children.add(at + 1, splitChild);
+  }
+
+  private boolean removeRecursive(Node<E> node, E element) {
+    if (node.isLeaf()) {
+      return node.items.remove(element);
+    }
+
+    int at;
+    for (at = 0; at < node.items.size(); at++) {
+      if (node.items.get(at).compareTo(element) > 0) break;
+    }
+
+    Node<E> child = node.children.get(at);
+    boolean removed = removeRecursive(child, element);
+    if (child.items.size() >= minItemCount(child)) return removed;
+
+    Node<E> sibling;
+    if (at >= 1
+        && node.children.get(at - 1).items.size() >= minItemCount(node.children.get(at - 1)) + 1) {
+      sibling = node.children.get(at - 1);
+      E siblingItem = sibling.items.get(sibling.items.size() - 1);
+      sibling.items.remove(sibling.items.size() - 1);
+
+      E nodeItem = node.items.get(at - 1);
+      node.items.set(at - 1, siblingItem);
+      child.items.add(0, nodeItem);
+
+      if (!child.isLeaf()) {
+        Node<E> siblingChild = sibling.children.get(sibling.children.size() - 1);
+        sibling.children.remove(sibling.children.size() - 1);
+        child.children.add(0, siblingChild);
+      }
+
+      node.items.set(at - 1, child.first());
+      return removed;
+    }
+
+    if (at < node.children.size() - 1
+        && node.children.get(at + 1).items.size() >= minItemCount(node.children.get(at + 1)) + 1) {
+      sibling = node.children.get(at + 1);
+      E siblingItem = sibling.items.get(0);
+      sibling.items.remove(0);
+
+      E nodeItem = node.items.get(at);
+      node.items.set(at, siblingItem);
+      child.items.add(nodeItem);
+
+      if (!child.isLeaf()) {
+        Node<E> siblingChild = sibling.children.get(0);
+        sibling.children.remove(0);
+        child.children.add(siblingChild);
+      }
+
+      node.items.set(at, sibling.first());
+      return removed;
+    }
+
+    if (at == node.children.size() - 1) at--;
+    child = node.children.get(at);
+    sibling = node.children.get(at + 1);
+
+    if (!child.isLeaf()) {
+      child.items.add(node.items.get(at));
+      child.children.addAll(sibling.children);
+    }
+    child.items.addAll(sibling.items);
+
+    child.next = sibling.next;
+    if (child.next != null) child.next.prev = child;
+
+    node.items.remove(at);
+    node.children.remove(at + 1);
+
+    return removed;
+  }
+
+  private <T extends Comparable<T>> int minChildCount(Node<T> node) {
+    return node.isLeaf() ? 0 : (bf + 1) / 2;
+  }
+
+  private <T extends Comparable<T>> int minItemCount(Node<T> node) {
+    return node.isLeaf() ? (bf + 1) / 2 : minChildCount(node) - 1;
+  }
+
+  private <T extends Comparable<T>> int maxChildCount(Node<T> node) {
+    return node.isLeaf() ? 0 : bf;
+  }
+
+  private <T extends Comparable<T>> int maxItemCount(Node<T> node) {
+    return bf - 1;
   }
 
   /**
@@ -170,7 +293,19 @@ public class BPlusTree<E extends Comparable<E>> {
       return Pair.of(midElement, splitNode);
     }
 
-    private void toPrettyStringChildren(StringBuilder sb, String prefix) {
+    E first() {
+      if (items.isEmpty()) return null;
+      if (isLeaf()) return items.get(0);
+      return children.get(0).first();
+    }
+
+    E last() {
+      if (items.isEmpty()) return null;
+      if (isLeaf()) return items.get(items.size() - 1);
+      return children.get(children.size() - 1).last();
+    }
+
+    void toPrettyStringChildren(StringBuilder sb, String prefix) {
       if (isLeaf()) return;
 
       for (int index = 0; index < children.size(); index++) {
