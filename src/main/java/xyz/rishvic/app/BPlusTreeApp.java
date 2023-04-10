@@ -33,7 +33,7 @@ import xyz.rishvic.util.BPlusTree;
 @Command(
     name = "b+demo",
     mixinStandardHelpOptions = true,
-    version = "B+ Tree demo 1.0-SNAPSHOT",
+    version = "B+ Tree demo 0.1.0",
     description = "A CLI application demonstrating B+ Tree operations.")
 public class BPlusTreeApp implements Callable<Integer> {
 

@@ -7,7 +7,7 @@
 
   <groupId>xyz.rishvic.app</groupId>
   <artifactId>b-plus-java</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>0.1.0</version>
 
   <name>b-plus-java</name>
   <!-- FIXME change it to the project's website -->
